@@ -1,7 +1,7 @@
 Youtube Search
 --------------
 * Yapımcı: Mehmet Hanoğlu ( dle.net.tr )
-* Tarih : 10.04.2015
+* Tarih : 20.04.2015
 * Lisans : GPL
 * DLE : 10.4, 10.3, 10.2
 
