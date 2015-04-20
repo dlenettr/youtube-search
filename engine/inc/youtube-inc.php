@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- MWS Youtube Search v1.1 - by MaRZoCHi
+ MWS Youtube Search v1.2 - by MaRZoCHi
 -----------------------------------------------------
  Site: http://dle.net.tr/
 -----------------------------------------------------
@@ -52,6 +52,9 @@ if ( $_REQUEST['action'] == "save" ) {
 	$save_con['thumbs_download'] = intval($save_con['thumbs_download']);
 	$save_con['use_sstory'] = intval($save_con['use_sstory']);
 	$save_con['use_title'] = intval($save_con['use_title']);
+	$save_con['use_sepfield'] = intval($save_con['use_sepfield']);
+	$save_con['use_stdresult'] = intval($save_con['use_stdresult']);
+	$save_con['stdresult_num'] = intval($save_con['stdresult_num']);
 
 	$find = array(); $replace = array();
 	$find[] = "'\r'"; $replace[] = "";
@@ -98,8 +101,9 @@ if ( $_REQUEST['action'] == "save" ) {
 
 } else {
 
-	echoheader( "<i class=\"icon-film\"></i> Youtube Search v1.1", "Youtube'dan video bilgileri çekebilirsiniz" );
+	echoheader( "<i class=\"icon-film\"></i> Youtube Search v1.2", "Youtube'dan video bilgileri çekebilirsiniz" );
 
+	$xfields[] = "-- Kullanma --";
 	foreach( xfieldsload() as $xarr) {
 		$xfields[$xarr[0]] = $xarr[1] . "\t(". $xarr[0] . ")";
 	}
@@ -117,6 +121,21 @@ if ( $_REQUEST['action'] == "save" ) {
 	<div class="box-content">
 	<table class="table table-normal">
 HTML;
+
+	showRow(
+		"Arama yazısı için özel alan kullan", "Eğer bu ayarı aktifleştirirseniz youtube aramaları için ayrı bir yazı alanı göreceksiniz. Pasif ise makale başlığı alanı kullanılacaktır.",
+		makeButton( "save[use_sepfield]", $yt_config['use_sepfield'] )
+	);
+
+	showRow(
+		"Arama sonuçlarında gösterilecek video sayısı", "Video araması yapıldığında gösterilecek olan video sayısını girin",
+		"<input name=\"save[stdresult_num]\" value=\"{$yt_config['stdresult_num']}\" size=\"4\" type=\"text\" style=\"text-align: center;\" />"
+	);
+
+	showRow(
+		"Makale sayfalarında sonuç sayısı alanını gösterme", "Eğer sabit sayıda sonuç görmek istiyorsanız bu ayarı aktifleştirin.",
+		makeButton( "save[use_stdresult]", $yt_config['use_stdresult'] )
+	);
 
 	showRow(
 		"Video Önizlemeleri",
@@ -144,11 +163,12 @@ HTML;
 	);
 
 	showRow(
-		"Başlık Alanı", "Video başlığını makale başlığı olarak kullan",
+		"Başlık Alanı", "Video başlığını makale başlığı olarak kullan. Videoyu seçtikten sonra makale başlığı yerine video başlığı girilecektir.",
 		makeButton( "save[use_title]", $yt_config['use_title'] )
 	);
+
 	showRow(
-		"Açıklama Alanı", "Video açıklamasını makale açıklaması olarak kullan",
+		"Açıklama Alanı", "Video açıklamasını makale açıklaması olarak kullan. Video açıklamasını 'kısa açıklama' olarak kullanır.",
 		makeButton( "save[use_sstory]", $yt_config['use_sstory'] )
 	);
 

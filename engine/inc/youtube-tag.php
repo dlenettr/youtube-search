@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- MWS Youtube Search v1.1 - by MaRZoCHi
+ MWS Youtube Search v1.2 - by MaRZoCHi
 -----------------------------------------------------
  Site: http://dle.net.tr/
 -----------------------------------------------------
@@ -138,8 +138,11 @@ if ( $yt_config['player_active'] ) {
 					$("#video_results ul li div span:first-child").click(function() {
 						var selected = $(this).parent("div").parent("li");
 						var url = selected.attr("url");
-						var vid = selected.attr("id");
+						var vid = selected.attr("vid");
 						var vtitle = selected.find("h3").html();
+						console.log( "url:" + url );
+						console.log( "vid:" + vid );
+						console.log( "vtitle:" + vtitle );
 						$("body").append("<div id=\"pplayer\" align=\"center\" title=\"" + vtitle + "\"><iframe width=\"{$yt_config['player_width']}\" height=\"{$yt_config['player_height']}\" src=\"http://www.youtube.com/embed/" + vid + "?vq=hd720&rel=0\" frameborder=\"0\" allowfullscreen></iframe></div>");
 						$("#pplayer").dialog({ height: {$d_height}, width: {$d_width}, modal: true, buttons: { Ok: function() { $(this).dialog( "close" ); $("#pplayer").hide().remove(); } } });
 					});
@@ -179,6 +182,12 @@ $video_field = <<< HTML
 				$("input[id='xf_{$yt_config['video_ser']}']").val( "Youtube" );
 HTML;
 
+if ( $yt_config['use_sepfield'] ) {
+	$title_selector = "#youtube_search";
+} else {
+	$title_selector = "#title";
+}
+
 echo <<< HTML
 <style>
 #video_result { height: 10px; width: 100%; background: #FFF; border:1px solid #E2E2E2; padding: 5px; margin: 5px 0; }
@@ -214,12 +223,17 @@ if ( jQuery && !jQuery.fn.live ) {
 	}
 }
 
+$(document).ready(function() {
+	$("{$title_selector}").blur( function() {
+		if ( $(this).val().length === 0 ) $("#video_results").slideUp();
+	});
+});
+
 function youtube() {
-	var title  = $("#title").val();
+	var title  = $("{$title_selector}").val();
 	var result = $("#result_num").val();
 	if ( title != "" ) {
 		if ( title.search("youtube.com") > 0 ) {
-
 			ShowLoading('Video bilgileri okunuyor...');
 			var count = 1;
 			{$thumb_process}
@@ -230,8 +244,6 @@ function youtube() {
 				$("#related_news").html('<div id="video_result" style="display: none;"></div>').fadeIn(500);
 				$("#video_result").html( '<div><img src="' + data.video.t1 + '" rel="click" /><p><span>' + data.video.s1 + '</p></span></div><div><img src="' + data.video.t2 + '" rel="click" /><p><span>' + data.video.s2 + '</p></span></div><div><img src="' + data.video.t3 + '" rel="click" /><p><span>' + data.video.s3 + '</p></span></div><div class="closebtn"><input type="button" class="btn btn-mini" value="Kapat" onclick="javascript:$(\'#video_result\').slideUp();" /></div>' ).show().animate({ height: "140px"});
 			},'json').done( HideLoading );
-
-
 		} else {
 			var _height = result * 53 + 10;
 			$.post("engine/ajax/youtube.php", { action: 'search', query: title, result: result }, function(data) {
@@ -275,6 +287,27 @@ function youtube() {
 	}
 }
 </script>
+HTML;
+
+$youtube_fields = "";
+if ( $yt_config['use_stdresult'] ) {
+	$youtube_fields .= <<< HTML
+<input type="hidden" id="result_num" value="{$yt_config['stdresult_num']}" />&nbsp;
+HTML;
+} else {
+	$youtube_fields .= <<< HTML
+<input type="text" style="width:40px;text-align:center" name="result_num" id="result_num" value="{$yt_config['stdresult_num']}" />&nbsp;
+HTML;
+}
+
+if ( $yt_config['use_sepfield'] ) {
+	$youtube_fields .= <<< HTML
+<input type="text" style="width:200px;" placeholder="Aranacak yazıyı girin" name="youtube_search" id="youtube_search" value="" />&nbsp;
+HTML;
+}
+
+$youtube_fields .= <<< HTML
+<button onclick="youtube(); return false;" title="Youtube'da Ara" class="btn btn-sm btn-danger"><i class="icon-search"></i></button>&nbsp;
 HTML;
 
 ?>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+	<id>Youtube Search</id>
+	<version>1.2</version>
+	<vqmver>2.4.1</vqmver>
+	<author>MaRZoCHi</author>
+	<file name="engine/inc/addnews.php">
+		<operation>
+			<ignoreif><![CDATA[require_once ENGINE_DIR . "/inc/youtube-tag.php";]]></ignoreif>
+			<search position="after"><![CDATA[$categories_list = CategoryNewsSelection( 0, 0 );]]></search>
+			<add><![CDATA[
+	// Youtube Search
+	require_once ENGINE_DIR . "/inc/youtube-tag.php";
+	// Youtube Search
+]]></add>
+		</operation>
+		<operation>
+			<ignoreif><![CDATA[{$youtube_fields}]]></ignoreif>
+			<search position="iafter"><![CDATA[<input type="text" style="width:99%;max-width:437px;" name="title" id="title">&nbsp;]]></search>
+			<add><![CDATA[{$youtube_fields}]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[<input type="text" style="width:40px;text-align:center" name="result_num" id="result_num" value="10" />&nbsp;<input class="btn btn-mini btn-danger" type="button" onClick="youtube();" style="width:100px;" value="Youtube">&nbsp;&nbsp;]]></search>
+			<add><![CDATA[]]></add>
+		</operation>
+	</file>
+	<file name="engine/inc/editnews.php">
+		<operation>
+			<ignoreif><![CDATA[require_once ENGINE_DIR . "/inc/youtube-tag.php";]]></ignoreif>
+			<search position="after"><![CDATA[echo $categoryfilter;]]></search>
+			<add><![CDATA[
+	// Youtube Search
+	require_once ENGINE_DIR . "/inc/youtube-tag.php";
+	// Youtube Search
+]]></add>
+		</operation>
+		<operation>
+			<ignoreif><![CDATA[{$youtube_fields}]]></ignoreif>
+			<search position="iafter"><![CDATA[<input type="text" style="width:99%;max-width:437px;" name="title" id="title" value="{$row['title']}">&nbsp;]]></search>
+			<add><![CDATA[{$youtube_fields}]]></add>
+		</operation>
+	</file>
+</modification>

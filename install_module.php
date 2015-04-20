@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- MWS Youtube Search v1.1 - by MaRZoCHi
+ MWS Youtube Search v1.2 - by MaRZoCHi
 -----------------------------------------------------
  Site: http://dle.net.tr/
 -----------------------------------------------------
@@ -61,12 +61,12 @@ HTML;
 
 
 $module = array(
-	'name'	=> "MWS Youtube Search v1.1",
+	'name'	=> "MWS Youtube Search v1.2",
 	'desc'	=> "Youtube'dan video bilgileri çekebilirsiniz",
 	'id'	=> "youtube-inc",
 	'icon'	=> "youtube.png",
 	'ticon' => "film",
-	'date'	=> "10.04.2015",
+	'date'	=> "20.04.2015",
 	'ifile'	=> "install_module.php",
 	'link'	=> "http://dle.net.tr",
 	'image'	=> "http://img.dle.net.tr/mws/youtube_search.png",
@@ -85,9 +85,13 @@ if ( $_REQUEST['action'] == "install" ) {
 	$mod->bootup( $path = ROOT_DIR, $logging = True );
 	$dle_api->install_admin_module($module['id'], $module['name'], $module['desc'], $module['icon'] , "1");
 	if ( $config['version_id'] >= "10.2" ) {
-		$mod->file( ROOT_DIR. "/install/xml/youtube_search_new.xml" );
+		$mod->file( ROOT_DIR. "/install/xml/youtube_search.xml" );
 	} else {
-		$mod->file( ROOT_DIR. "/install/xml/youtube_search_old.xml" );
+		mainTable_head( $lang['m27'] );
+		echo "<div style=\"padding:10px; background: #990000; color: #fff;\">{$lang['m28']}<br />{$lang['m29']} :<br /><br /><i>http://dle.net.tr</i></div>";
+		mainTable_foot();
+		echofooter();
+		die();
 	}
 	$mod->close();
 
