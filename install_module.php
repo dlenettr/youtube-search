@@ -58,7 +58,7 @@ function mainTable_foot() {
 		</div>
 	</div>
 HTML;
-
+}
 
 $module = array(
 	'name'	=> "MWS Youtube Search v1.2",
@@ -76,7 +76,7 @@ $module = array(
 	'tran_s'	=> "",
 );
 
-echoheader("<i class=\"icon-{$module['ticon']}\"></i>" . $module['name'], $lang['m01'] );
+echoheader("<i class=\"icon-{$module['ticon']}\"></i>" . $module['name'], $module['desc'] );
 
 if ( $_REQUEST['action'] == "install" ) {
 
