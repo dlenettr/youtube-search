@@ -1,7 +1,7 @@
 <?php
 /*
 =====================================================
- MWS Youtube Search v1.1 - by MaRZoCHi
+ MWS Youtube Search v1.2 - by MaRZoCHi
 -----------------------------------------------------
  Site: http://dle.net.tr/
 -----------------------------------------------------
@@ -42,6 +42,8 @@ require_once ENGINE_DIR . '/modules/sitelogin.php';
 
 $_IP = get_ip();
 dle_session();
+
+$yt_config['write_db'] = "0";
 
 if ( ! $is_logged ) die( "Hacking attempt!" );
 
@@ -85,12 +87,15 @@ function download_img( $url ) {
 	}
 	$save = $yt_config['video_thmbdir'] . md5( $url ) . ".jpg";
 	$fp = fopen( UPLOAD_DIR . $save, "w") ; fwrite($fp, $output) ; fclose($fp); unset( $fp, $output );
-	$id = $db->super_query("SELECT MAX(id) as max FROM " . PREFIX . "_post"); $id['max']++; $db->free();
-	$id_max = $id['max'];
-	$_save = str_replace("posts/", "", $save);
-	$db->query("INSERT INTO " . PREFIX . "_images (images, news_id, author, date) VALUES ('{$_save}', '{$id_max}', '{$member_id['name']}', '{$_TIME}')");
-	// resize & watermark
-	unset( $img, $id, $id_max, $_save );
+
+	if ( $yt_config['write_db'] ) {
+		$id = $db->super_query("SELECT MAX(id) as max FROM " . PREFIX . "_post"); $id['max']++; $db->free();
+		$id_max = $id['max'];
+		$_save = str_replace("posts/", "", $save);
+		$db->query("INSERT INTO " . PREFIX . "_images (images, news_id, author, date) VALUES ('{$_save}', '{$id_max}', '{$member_id['name']}', '{$_TIME}')");
+		// resize & watermark
+		unset( $id, $id_max, $_save );
+	}
 
 	return $config['http_home_url'] . "uploads/" . $save . "\n";
 }
@@ -100,30 +105,30 @@ if ( $_POST['action'] == "search" ) {
 	if ( isset( $_POST['query'] ) && isset( $_POST['result'] ) ) {
 		$query = urlencode( $db->safesql( trim( $_POST['query'] ) ) );
 		$set_maxresult = strval( $db->safesql( $_POST['result'] ) );
-		$url = "http://gdata.youtube.com/feeds/api/videos?q=" . $query . "&max-results={$set_maxresult}&alt=json";
+		$url = "https://www.googleapis.com/youtube/v3/search?q=" . $query . "&key=AIzaSyAfY8bbWm_8ZgV0HNaa51NDzxg6nmhyLI4&part=snippet&maxResults={$set_maxresult}&fields=items(id%2Csnippet)";
 		$json = getURLContent( $url );
 		$result = objectToArray( json_decode( $json ) );
 		$results = array();
 		$results['results'] = "<div id=\"video_results\"><ul>";
 		$results['error'] = "";
 		if ( $result ) {
-			foreach( $result['feed']['entry'] as $item ) {
+			foreach( $result['items'] as $item ) {
 				$video = array(
-					'title'		=> $item['media$group']['media$title']['$t'],
-					'link'		=> $item['media$group']['media$player']['0']['url'],
-					'mlink'		=> $item['link']['3']['href'],
-					'date'		=> $item['published']['$t'],
-					'thumb'		=> $item['media$group']['media$thumbnail']['0']['url'],
-					't1'		=> $item['media$group']['media$thumbnail']['1']['url'],
-					't2'		=> $item['media$group']['media$thumbnail']['2']['url'],
-					't3'		=> $item['media$group']['media$thumbnail']['3']['url'],
-					's1'		=> $item['media$group']['media$thumbnail']['1']['time'],
-					's2'		=> $item['media$group']['media$thumbnail']['2']['time'],
-					's3'		=> $item['media$group']['media$thumbnail']['3']['time'],
-					'length'	=> $item['media$group']['yt$duration']['seconds'],
-					'author'	=> $item['author']['0']['name']['$t'],
-					'desc'		=> $item['media$group']['media$description']['$t'],
-					'id'		=> "",
+					'title'		=> $item['snippet']['title'],
+					'link'		=> "https://www.youtube.com/watch?v=" . $item['id']['videoId'],
+					//'mlink'		=> $item['link']['3']['href'],
+					'date'		=> $item['snippet']['publishedAt'],
+					'thumb'		=> $item['snippet']['thumbnails']['high']['url'],
+					//'t1'		=> $item['media$group']['media$thumbnail']['1']['url'],
+					//'t2'		=> $item['media$group']['media$thumbnail']['2']['url'],
+					//'t3'		=> $item['media$group']['media$thumbnail']['3']['url'],
+					//'s1'		=> $item['media$group']['media$thumbnail']['1']['time'],
+					//'s2'		=> $item['media$group']['media$thumbnail']['2']['time'],
+					//'s3'		=> $item['media$group']['media$thumbnail']['3']['time'],
+					//'length'	=> $item['media$group']['yt$duration']['seconds'],
+					'author'	=> $item['snippet']['channelTitle'],
+					'desc'		=> $item['snippet']['description'],
+					'id'		=> $item['id']['videoId'],
 				);
 				$video['link'] = str_replace( "&feature=youtube_gdata_player", "", $video['link'] );
 				$video['title'] = str_replace( "\\", "", strip_tags( $video['title'] ) );
